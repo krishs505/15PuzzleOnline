@@ -33,7 +33,9 @@ socket.on('updatePlayers', (backEndPlayers) => {
         ready: backEndPlayer.ready
       }
     } else { // if this player exists, update boards and ready status from backend
-      frontEndPlayers[id].board = backEndPlayer.board
+      //if (id !== socket.id) {
+        frontEndPlayers[id].board = backEndPlayer.board
+      //  }
       frontEndPlayers[id].ready = backEndPlayer.ready
       frontEndPlayers[id].timeStarted = backEndPlayer.timeStarted
       frontEndPlayers[id].finished = backEndPlayer.finished
@@ -343,9 +345,10 @@ imagesToLoad.forEach((src, index) => {
   img.src = src;
 });
 
+const rect = canvas.getBoundingClientRect();
 document.addEventListener('click', function(e) {
-  let mx = e.clientX;
-  let my = e.clientY;
+  let mx = (e.clientX - rect.left) * devicePixelRatio;
+  let my = (e.clientY - rect.top) * devicePixelRatio;
   
   if (frontEndPlayers[socket.id] && mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH) {
     if (!frontEndPlayers[socket.id].ready) {
