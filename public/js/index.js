@@ -14,6 +14,7 @@ const w = canvas.width
 const h = canvas.height
 
 const frontEndPlayers = {}
+let generateBoardRN = false;
 
 /*
 socket.on('connect', () => {
@@ -33,7 +34,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
         ready: backEndPlayer.ready
       }
     } else { // if this player exists, update boards and ready status from backend
-      if (id !== socket.id) {
+      if (generateBoardRN || id !== socket.id) {
         frontEndPlayers[id].board = backEndPlayer.board
       }
       frontEndPlayers[id].ready = backEndPlayer.ready
@@ -147,6 +148,7 @@ async function animate() {
     if (stage === "lobby" || (stage === "gameover" && waitingForNext)) {
       if (oppID !== "" && frontEndPlayers[socket.id].ready && frontEndPlayers[oppID].ready) {
         cStr("3", ctx, 0, 0, w, h, "arial", txtSize)
+        generateBoardRN = true;
         socket.emit('generateBoard');
         socket.emit('resetGame');
         waitingForNext = false;
@@ -163,6 +165,7 @@ async function animate() {
         cStr("2", ctx, 0, 0, w, h, "arial", txtSize)
       } else if (currTime - countdownStopwatch >= 2000 && currTime - countdownStopwatch < 3000) {
         cStr("1", ctx, 0, 0, w, h, "arial", txtSize)
+        generateBoardRN = false;
       } else if (currTime - countdownStopwatch >= 3000) {
         cStr("GO!", ctx, 0, 0, w, h, "arial", txtSize)
         stage = "game";
@@ -324,7 +327,7 @@ async function animate() {
           }
         }
       }
-      console.log(stage)
+      //console.log(stage)
 
     }
   }

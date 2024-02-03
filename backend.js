@@ -107,7 +107,7 @@ io.on('connection', (socket) => {
     }
 
     backEndPlayers[socket.id].board = tempBoard;
-    console.log(backEndBoard.length)
+    //console.log(backEndBoard.length)
   })
 
   socket.on('playerFinished', (wonStatus, timeEnded) => {
