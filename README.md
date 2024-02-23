@@ -15,4 +15,4 @@ How it works:
 
 It sounds like a lot because well, it is. I was pretty shocked to realize how much development goes into a simple multiplayer game.
 
-I can only imagine how much effort goes into far more complicated games that we play everyday (although, I guess game engines handle a lot of it).
+I can only imagine how much effort goes into far more complicated games that we play everyday (although I guess game engines handle a lot of it).
