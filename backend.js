@@ -25,27 +25,47 @@ io.on('connection', (socket) => {
   io.emit('updatePlayers', backEndPlayers)
 
   socket.on('initGame', ({ username, width, height, devicePixelRatio }) => {
-    const copiedBoard = [];
-    for (var i = 0; i < initialBoard.length; i++) {
-      copiedBoard[i] = initialBoard[i].slice();
-    }
+    const currentPlayers = Object.keys(backEndPlayers).filter(id => !backEndPlayers[id].spectator);
+    const isSpectator = currentPlayers.length >= 2;
+
+    const copiedBoard = initialBoard.map(row => row.slice());
 
     // create backend player object for connected user
     backEndPlayers[socket.id] = {
       board: copiedBoard,
       username,
       ready: false,
-      canvas: {width, height}
+      canvas: {width, height},
+      spectator: isSpectator
     }
 
-    console.log(username + " joined.")
+    if (isSpectator) {
+      console.log(username + " joined as a spectator.")
+    } else {
+      console.log(username + " joined the game.")
+    }
   })
 
   // delete player who disconnects
   socket.on('disconnect', (reason) => {
-    console.log(reason)
-    delete backEndPlayers[socket.id]
-    io.emit('updatePlayers', backEndPlayers)
+    if (backEndPlayers[socket.id]) { // this player still exists in backEndPlayers (isn't from a previous session)
+
+      console.log(backEndPlayers[socket.id].username + " disconnected. reason: " + reason)
+      
+      const currentSpectators = Object.keys(backEndPlayers).filter(id => backEndPlayers[id].spectator);
+      
+      // add the first spectator to the game after a player leaves
+      if (currentSpectators.length > 0 && !backEndPlayers[socket.id].spectator) {
+        backEndPlayers[currentSpectators[0]].spectator = false;
+      }
+      
+      delete backEndPlayers[socket.id]
+
+      io.emit('updatePlayers', backEndPlayers)
+
+    } else {
+      console.log("player disconnected. reason: " + reason)
+    }
   })
 
   // when the backend receives request to that key is down

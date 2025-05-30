@@ -10,8 +10,8 @@ const devicePixelRatio = window.devicePixelRatio || 1
 canvas.width = innerWidth * devicePixelRatio
 canvas.height = innerHeight * devicePixelRatio
 
-const w = canvas.width
-const h = canvas.height
+let w = canvas.width
+let h = canvas.height
 
 const frontEndPlayers = {}
 let generateBoardRN = false;
@@ -31,7 +31,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
       frontEndPlayers[id] = {
         board: backEndPlayer.board,
         username: backEndPlayer.username,
-        ready: backEndPlayer.ready
+        ready: backEndPlayer.ready,
+        spectator: backEndPlayer.spectator
       }
     } else { // if this player exists, update boards and ready status from backend
       if (generateBoardRN || id !== socket.id) {
@@ -42,6 +43,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
       frontEndPlayers[id].finished = backEndPlayer.finished
       frontEndPlayers[id].won = backEndPlayer.won
       frontEndPlayers[id].timeEnded = backEndPlayer.timeEnded
+      frontEndPlayers[id].spectator = backEndPlayer.spectator
     }
   }
 
@@ -113,6 +115,8 @@ const txtSize = 0.11 * h;
 
 let imgs = {};
 
+let currentHole = [3, 3];
+
 let animationId
 async function animate() {
   animationId = requestAnimationFrame(animate)
@@ -158,6 +162,9 @@ async function animate() {
         cStr("2", ctx, 0, 0, w, h, "arial", txtSize)
       } else if (currTime - countdownStopwatch >= 2000 && currTime - countdownStopwatch < 3000) {
         cStr("1", ctx, 0, 0, w, h, "arial", txtSize)
+        if (generateBoardRN) { // not the point of this variable, but using it so holePos only runs once
+          currentHole = holePos(frontEndPlayers[socket.id].board);
+        }
         generateBoardRN = false;
       } else if (currTime - countdownStopwatch >= 3000) {
         cStr("GO!", ctx, 0, 0, w, h, "arial", txtSize)
@@ -172,6 +179,7 @@ async function animate() {
     }
 
     for (const id in frontEndPlayers) {
+      if (frontEndPlayers[id].spectator) continue;
 
       var board = frontEndPlayers[id].board;
 
@@ -295,24 +303,25 @@ async function animate() {
           }
 
           ctx.fillStyle = 'rgba(255, 255, 255, 1)'
-          cStr(secondsToTime((currTime - frontEndPlayers[id].timeStarted)/1000), ctx, left + size/2 + 0.065*w, 0.917*h, 0.13*w, 0.076*h, "arial", txtSize*0.5)
-        } else {
-          // not the current frontend player
+          cStr(secondsToTime((currTime - frontEndPlayers[id].timeStarted)/1000), ctx, left + size/2 + 0.065*w, 0.82*h, 0.13*w, 0.076*h, "arial", txtSize*0.5)
+        } else { // not the current frontend player
+
           if (frontEndPlayers[id].finished) {
             ctx.fillStyle = 'rgba(255, 255, 255, 1)'
-            cStr(secondsToTime((frontEndPlayers[id].timeEnded - frontEndPlayers[id].timeStarted)/1000), ctx, left + size/2 + 0.065*w, 0.917*h, 0.13*w, 0.076*h, "arial", txtSize*0.5)
+            cStr(secondsToTime((frontEndPlayers[id].timeEnded - frontEndPlayers[id].timeStarted)/1000), ctx, left + size/2 + 0.065*w, 0.82*h, 0.13*w, 0.076*h, "arial", txtSize*0.5)
 
             ctx.drawImage(imgs[0], left + size/2 - 0.143*h, top + size/2 - 0.143*h, 0.285*h, 0.285*h);
           } else {
             ctx.fillStyle = 'rgba(255, 255, 255, 1)'
-            cStr(secondsToTime((currTime - frontEndPlayers[id].timeStarted)/1000), ctx, left + size/2 + 0.065*w, 0.917*h, 0.13*w, 0.076*h, "arial", txtSize*0.5)
+            cStr(secondsToTime((currTime - frontEndPlayers[id].timeStarted)/1000), ctx, left + size/2 + 0.065*w, 0.82*h, 0.13*w, 0.076*h, "arial", txtSize*0.5)
           }
+
         }
         
       } else if (stage === "gameover") {
         ctx.fillStyle = 'rgba(255, 255, 255, 1)'
         if (id === socket.id) {
-          cStr(secondsToTime((frontEndPlayers[id].timeEnded - frontEndPlayers[id].timeStarted)/1000), ctx, left + size/2 + 0.065*w, 0.917*h, 0.13*w, 0.076*h, "arial", txtSize*0.5)
+          cStr(secondsToTime((frontEndPlayers[id].timeEnded - frontEndPlayers[id].timeStarted)/1000), ctx, left + size/2 + 0.065*w, 0.82*h, 0.13*w, 0.076*h, "arial", txtSize*0.5)
 
           if (frontEndPlayers[id].won) {
             ctx.drawImage(imgs[0], left + size/2 - 0.143*h, top + size/2 - 0.143*h, 0.285*h, 0.285*h);
@@ -323,7 +332,7 @@ async function animate() {
         } else {
           if (frontEndPlayers[id].finished) {
             // opponent is finished
-            cStr(secondsToTime((frontEndPlayers[id].timeEnded - frontEndPlayers[id].timeStarted)/1000), ctx, left + size/2 + 0.065*w, 0.917*h, 0.13*w, 0.076*h, "arial", txtSize*0.5)
+            cStr(secondsToTime((frontEndPlayers[id].timeEnded - frontEndPlayers[id].timeStarted)/1000), ctx, left + size/2 + 0.065*w, 0.82*h, 0.13*w, 0.076*h, "arial", txtSize*0.5)
             
             if (frontEndPlayers[id].won) {
               ctx.drawImage(imgs[0], left + size/2 - 0.143*h, top + size/2 - 0.143*h, 0.285*h, 0.285*h);
@@ -334,7 +343,7 @@ async function animate() {
             waitingForNext = true;
             
           } else {
-            cStr(secondsToTime((currTime - frontEndPlayers[id].timeStarted)/1000), ctx, left + size/2 + 0.065*w, 0.917*h, 0.13*w, 0.076*h, "arial", txtSize*0.5)
+            cStr(secondsToTime((currTime - frontEndPlayers[id].timeStarted)/1000), ctx, left + size/2 + 0.065*w, 0.82*h, 0.13*w, 0.076*h, "arial", txtSize*0.5)
           }
         }
       }
@@ -359,7 +368,7 @@ imagesToLoad.forEach((src, index) => {
   img.src = src;
 });
 
-const rect = canvas.getBoundingClientRect();
+let rect = canvas.getBoundingClientRect();
 
 document.addEventListener('click', function(e) {
   let mx = (e.clientX - rect.left) * devicePixelRatio;
@@ -376,7 +385,10 @@ document.addEventListener('click', function(e) {
   }
 });
 
+times = [];
+
 document.addEventListener('mousemove', function(e) {
+  let start = performance.now();
   if (stage === "countdown" || stage === "gameover") return;
 
   let left = (w-size)/2 - shift;
@@ -388,7 +400,10 @@ document.addEventListener('mousemove', function(e) {
   let c = Math.floor(mx / tileSize);
 
   if (inRange(r) && inRange(c)) {
-    const [hr, hc] = holePos(frontEndPlayers[socket.id].board);
+    
+    const [hr, hc] = currentHole;
+    //const [hr, hc] = holePos(frontEndPlayers[socket.id].board);
+    
     if ((r === hr) !== (c === hc)) { // XOR, one of them must be true but not both (this removes the case where mouse is on hole)
       //console.log(`row ${r}, col ${c}`);
 
@@ -400,6 +415,12 @@ document.addEventListener('mousemove', function(e) {
 
       // emit to backend
       socket.emit('boardUpdate', frontEndPlayers[socket.id].board);
+
+      // update hole position
+      currentHole = [r, c];
+
+      let end = performance.now();
+      times.push(end - start);
     }
   }
 });
@@ -422,7 +443,8 @@ document.addEventListener('touchmove', (e) => {
   let c = Math.floor(mx / tileSize);
 
   if (inRange(r) && inRange(c)) {
-    const [hr, hc] = holePos(frontEndPlayers[socket.id].board);
+    const [hr, hc] = currentHole;
+
     if ((r === hr) !== (c === hc)) { // XOR, one of them must be true but not both (this removes the case where mouse is on hole)
       //console.log(`row ${r}, col ${c}`);
 
@@ -434,6 +456,9 @@ document.addEventListener('touchmove', (e) => {
 
       // emit to backend
       socket.emit('boardUpdate', frontEndPlayers[socket.id].board);
+
+      // update hole position
+      currentHole = [r, c];
     }
   }
 }, { passive: false });
@@ -453,13 +478,28 @@ const keys = {
   },
 }
 
-function inRange(n) {
-  if (n >= 0 && n <= 3) {
-    return true;
+const inRange = n => n >= 0 && n < 4;
+
+function median(arr) {
+  const sorted = [...arr].sort((a, b) => a - b); // sort numerically
+  const mid = Math.floor(sorted.length / 2);
+
+  if (sorted.length % 2 === 0) {
+    // Even length: average of two middle values
+    return (sorted[mid - 1] + sorted[mid]) / 2;
   } else {
-    return false;
+    // Odd length: return the middle value
+    return sorted[mid];
   }
 }
+function maxim(arr) {
+  return Math.max(...arr);
+}
+function avg(arr) {
+  const sum = arr.reduce((a, b) => a + b, 0);
+  return sum / arr.length;
+}
+
 function holePos(board) {
   for (var r = 0; r < 4; r++) {
     for (var c = 0; c < 4; c++) {
