@@ -181,7 +181,7 @@ async function animate() {
         
         // define button position
         btnX = left + size/2 - 0.065*w
-        btnY = 0.917*h
+        btnY = 0.82*h
         btnW = 0.13*w
         btnH = 0.076*h
       } else {
@@ -383,6 +383,39 @@ document.addEventListener('mousemove', function(e) {
   let top = (h-size)/2;
   let mx = (e.clientX - rect.left) * devicePixelRatio - left;
   let my = (e.clientY - rect.top) * devicePixelRatio - top;
+
+  let r = Math.floor(my / tileSize);
+  let c = Math.floor(mx / tileSize);
+
+  if (inRange(r) && inRange(c)) {
+    const [hr, hc] = holePos(frontEndPlayers[socket.id].board);
+    if ((r === hr) !== (c === hc)) { // XOR, one of them must be true but not both (this removes the case where mouse is on hole)
+      //console.log(`row ${r}, col ${c}`);
+
+      if (r === hr) { // left right
+        mouseLR(frontEndPlayers[socket.id].board, r, c, hc);
+      } else { // up down
+        mouseUD(frontEndPlayers[socket.id].board, r, c, hr);
+      }
+
+      // emit to backend
+      socket.emit('boardUpdate', frontEndPlayers[socket.id].board);
+    }
+  }
+});
+
+document.addEventListener('touchmove', function(e) {
+  if (stage === "countdown" || stage === "gameover") return;
+
+  // Prevent scrolling (optional)
+  e.preventDefault();
+
+  const touch = e.touches[0];
+
+  let left = (w-size)/2 - shift;
+  let top = (h-size)/2;
+  let mx = (touch.clientX - rect.left) * devicePixelRatio - left;
+  let my = (touch.clientY - rect.top) * devicePixelRatio - top;
 
   let r = Math.floor(my / tileSize);
   let c = Math.floor(mx / tileSize);
