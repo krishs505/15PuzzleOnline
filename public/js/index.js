@@ -408,7 +408,7 @@ document.addEventListener('touchmove', function(e) {
   if (stage === "countdown" || stage === "gameover") return;
 
   // Prevent scrolling (optional)
-  //e.preventDefault();
+  e.preventDefault();
 
   const touch = e.touches[0];
 
