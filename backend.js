@@ -66,6 +66,10 @@ io.on('connection', (socket) => {
     }
   })
 
+  socket.on('boardUpdate', (board) => {
+    backEndPlayers[socket.id].board = board;
+  })
+
   socket.on('newReadyStatus', (readyStatus) => {
     backEndPlayers[socket.id].ready = readyStatus;
   })

@@ -106,7 +106,9 @@ let btnW = 0;
 let btnH = 0;
 
 const shift = 0.26 * w;
-const separation = 0.00549 * h;
+const size = 0.62 * h - 30; // 0.82 * h - 30
+const tileSize = size / 4;
+
 const txtSize = 0.11 * h;
 
 let imgs = {};
@@ -126,20 +128,11 @@ async function animate() {
     cStr("Kihei's", ctx, 0, 0, w, 550, "arial", txtSize*0.5)
     cStr("15 Puzzle!", ctx, 0, 0, w, 710, "arial", txtSize*0.7)
   } else {
-    let size = 0.82 * h;
-
-    // outline
-    ctx.fillStyle = 'rgba(128, 115, 110, 1)'
-    ctx.fillRect((w-size)/2 - shift, (h-size)/2, size, size)
-    ctx.fillRect((w-size)/2 + shift, (h-size)/2, size, size)
-    size -= 30;
-
     let left = (w-size)/2 - shift;
     let top = (h-size)/2;
-    let tileSize = size / 4;
 
     // inner box
-    ctx.fillStyle = 'rgba(191, 181, 166, 1)'
+    ctx.fillStyle = 'rgba(54, 54, 54, 1)'
     ctx.fillRect(left, top, size, size)
     ctx.fillRect(left + 2*shift, top, size, size)
 
@@ -198,34 +191,52 @@ async function animate() {
 
       // ready buttons
       ctx.fillStyle = 'rgba(191, 181, 166, 1)'
-      ctx.fillRect(left + size/2 - 0.065*w, 0.917*h, 0.13*w, 0.076*h)
+      ctx.fillRect(left + size/2 - 0.065*w, 0.82*h, 0.13*w, 0.076*h)
       if (frontEndPlayers[id].ready) {
         ctx.fillStyle = 'rgba(0, 255, 0, 1)'
       } else {
         ctx.fillStyle = 'rgba(255, 0, 0, 1)'
       }
-      cStr("Ready", ctx, left + size/2 - 0.065*w, 0.917*h, 0.13*w, 0.076*h, "arial", txtSize*0.5)
+      cStr("Ready", ctx, left + size/2 - 0.065*w, 0.82*h, 0.13*w, 0.076*h, "arial", txtSize*0.5)
 
-      var currentX = left
-      var currentY = top
+      var currentX = left;
+      var currentY = top;
 
       // draw tiles
       for (var r = 0; r < 4; r++) {
         for (var c = 0; c < 4; c++) {
           var num = board[r][c]
           if (num !== 0) {
+            // correct spot coloring
+            /*
             if (correctSpot(num, r, c)) {
               ctx.fillStyle = 'rgba(149, 255, 143, 1)'
             } else {
               ctx.fillStyle = 'rgba(240, 255, 143, 1)'
             }
+            */
+
+            // speed sliding coloring
+            if (num <= 4) {
+              ctx.fillStyle = 'rgba(254, 102, 105, 1)';
+            } else if (num === 5 || num === 9 || num === 13) {
+              ctx.fillStyle = 'rgba(255, 238, 101, 1)';
+            } else if (num === 6 || num === 7 || num === 8) {
+              ctx.fillStyle = 'rgba(130, 253, 114, 1)';
+            } else if (num === 10 || num === 14) {
+              ctx.fillStyle = 'rgba(130, 255, 223, 1)';
+            } else if (num === 11 || num === 12) {
+              ctx.fillStyle = 'rgba(142, 181, 251, 1)';
+            } else if (num === 15) {
+              ctx.fillStyle = 'rgba(204, 139, 250, 1)';
+            }
 
             // tile
-            ctx.fillRect(currentX + separation, currentY + separation, tileSize - separation*2, tileSize - separation*2);
+            ctx.fillRect(currentX, currentY, tileSize, tileSize);
             
             // number text
-            ctx.fillStyle = 'rgba(40, 41, 38, 1)'
-            cStr(num.toString(), ctx, currentX, currentY, tileSize, tileSize, "arial", txtSize)
+            ctx.fillStyle = 'rgba(10, 11, 34, 1)'
+            cStr(num.toString(), ctx, currentX, currentY, tileSize, tileSize, "arial", txtSize*0.6)
           }
           currentX += tileSize;
         }
@@ -238,12 +249,12 @@ async function animate() {
       var the_name = frontEndPlayers[id].username;
       if (the_name === "") {
         if (id === socket.id) {
-          the_name = "You"
+          the_name = "You";
         } else {
-          the_name = "Player 2"
+          the_name = "Player 2";
         }
       }
-      cStr(the_name, ctx, left, top - 0.45*h, size, size, "arial", txtSize*0.6)
+      cStr(the_name, ctx, left, top - 0.35*h, size, size, "arial", txtSize*0.6)
 
       let currTime = Date.now();
       if (stage === "game") {
@@ -349,6 +360,7 @@ imagesToLoad.forEach((src, index) => {
 });
 
 const rect = canvas.getBoundingClientRect();
+
 document.addEventListener('click', function(e) {
   let mx = (e.clientX - rect.left) * devicePixelRatio;
   let my = (e.clientY - rect.top) * devicePixelRatio;
@@ -360,6 +372,34 @@ document.addEventListener('click', function(e) {
     } else {
       frontEndPlayers[socket.id].ready = false;
       socket.emit('newReadyStatus', false);
+    }
+  }
+});
+
+document.addEventListener('mousemove', function(e) {
+  if (stage === "countdown" || stage === "gameover") return;
+
+  let left = (w-size)/2 - shift;
+  let top = (h-size)/2;
+  let mx = (e.clientX - rect.left) * devicePixelRatio - left;
+  let my = (e.clientY - rect.top) * devicePixelRatio - top;
+
+  let r = Math.floor(my / tileSize);
+  let c = Math.floor(mx / tileSize);
+
+  if (inRange(r) && inRange(c)) {
+    const [hr, hc] = holePos(frontEndPlayers[socket.id].board);
+    if ((r === hr) !== (c === hc)) { // XOR, one of them must be true but not both (this removes the case where mouse is on hole)
+      //console.log(`row ${r}, col ${c}`);
+
+      if (r === hr) { // left right
+        mouseLR(frontEndPlayers[socket.id].board, r, c, hc);
+      } else { // up down
+        mouseUD(frontEndPlayers[socket.id].board, r, c, hr);
+      }
+
+      // emit to backend
+      socket.emit('boardUpdate', frontEndPlayers[socket.id].board);
     }
   }
 });
@@ -395,6 +435,28 @@ function holePos(board) {
     }
   }
 }
+
+function mouseLR(board, r, c, hc) {
+  for (let i = 0; i < Math.abs(c - hc); i++) {
+    if (c > hc) {
+      board[r][hc + i] = board[r][hc + i + 1];
+    } else {
+      board[r][hc - i] = board[r][hc - i - 1];
+    }
+  }
+  board[r][c] = 0;
+}
+function mouseUD(board, r, c, hr) {
+  for (let i = 0; i < Math.abs(r - hr); i++) {
+    if (r > hr) {
+      board[hr + i][c] = board[hr + i + 1][c];
+    } else {
+      board[hr - i][c] = board[hr - i - 1][c];
+    }
+  }
+  board[r][c] = 0;
+}
+
 function moveLR(board, n) {
   const hp = holePos(board);
   if (inRange(hp[1] - n)) {
@@ -410,6 +472,7 @@ function moveUD(board, n) {
   }
 }
 
+/*
 // every 15 ms, check if a key is pressed, move tiles, emit it to backend
 setInterval(() => {
   if (stage === "countdown" || stage === "gameover") return;
@@ -484,6 +547,7 @@ window.addEventListener('keyup', (event) => {
       break
   }
 })
+*/
 
 document.querySelector('#usernameForm').addEventListener('submit', (event) => {
   
