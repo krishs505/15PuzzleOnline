@@ -436,7 +436,7 @@ document.addEventListener('touchmove', (e) => {
       socket.emit('boardUpdate', frontEndPlayers[socket.id].board);
     }
   }
-}, { passive: false });
+});
 
 const keys = {
   w: {
