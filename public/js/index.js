@@ -125,8 +125,8 @@ async function animate() {
 
   if (!frontEndPlayers[socket.id]) {
     ctx.fillStyle = 'rgba(255, 255, 255, 1)'
-    cStr("Kihei's", ctx, 0, 0, w, 550, "arial", txtSize*0.5)
-    cStr("15 Puzzle!", ctx, 0, 0, w, 710, "arial", txtSize*0.7)
+    cStr("Kihei's", ctx, 0, 0, w, 0.604*h, "arial", txtSize*0.5)
+    cStr("15 Puzzle!", ctx, 0, 0, w, 0.779*h, "arial", txtSize*0.7)
   } else {
     let left = (w-size)/2 - shift;
     let top = (h-size)/2;
