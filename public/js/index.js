@@ -404,7 +404,8 @@ document.addEventListener('mousemove', function(e) {
   }
 });
 
-document.addEventListener('touchmove', function(e) {
+let isTouching = false;
+document.addEventListener('touchmove', (e) => {
   if (stage === "countdown" || stage === "gameover") return;
 
   // Prevent scrolling (optional)
@@ -435,7 +436,7 @@ document.addEventListener('touchmove', function(e) {
       socket.emit('boardUpdate', frontEndPlayers[socket.id].board);
     }
   }
-});
+}, { passive: false });
 
 const keys = {
   w: {
