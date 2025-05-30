@@ -411,6 +411,7 @@ document.addEventListener('touchmove', function(e) {
   //e.preventDefault();
 
   const touch = e.touches[0];
+  console.log(e.touches.length)
 
   let left = (w-size)/2 - shift;
   let top = (h-size)/2;
