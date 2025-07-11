@@ -385,10 +385,7 @@ document.addEventListener('click', function(e) {
   }
 });
 
-times = [];
-
 document.addEventListener('mousemove', function(e) {
-  let start = performance.now();
   if (stage === "countdown" || stage === "gameover") return;
 
   let left = (w-size)/2 - shift;
@@ -402,7 +399,6 @@ document.addEventListener('mousemove', function(e) {
   if (inRange(r) && inRange(c)) {
     
     const [hr, hc] = currentHole;
-    //const [hr, hc] = holePos(frontEndPlayers[socket.id].board);
     
     if ((r === hr) !== (c === hc)) { // XOR, one of them must be true but not both (this removes the case where mouse is on hole)
       //console.log(`row ${r}, col ${c}`);
@@ -418,9 +414,6 @@ document.addEventListener('mousemove', function(e) {
 
       // update hole position
       currentHole = [r, c];
-
-      let end = performance.now();
-      times.push(end - start);
     }
   }
 });
@@ -476,6 +469,9 @@ const keys = {
   d: {
     pressed: false
   },
+  space: {
+    pressed: false
+  }
 }
 
 const inRange = n => n >= 0 && n < 4;
@@ -546,11 +542,39 @@ function moveUD(board, n) {
   }
 }
 
-/*
+
 // every 15 ms, check if a key is pressed, move tiles, emit it to backend
 setInterval(() => {
-  if (stage === "countdown" || stage === "gameover") return;
+  if (stage === "lobby") {
+    if (keys.space.pressed) {
+      let tempBoard = [];
 
+      for (var i = 0; i < 4; i++) {
+        tempBoard[i] = frontEndPlayers[socket.id].board[i].slice();
+      }
+    
+      for (var i = 0; i < 1000000; i++) {
+        let rand = Math.floor(Math.random() * 4);
+
+        switch (rand) {
+          case 0:
+            moveLR(tempBoard, 1); break;
+          case 1:
+            moveLR(tempBoard, -1); break;
+          case 2:
+            moveUD(tempBoard, 1); break;
+          case 3:
+            moveUD(tempBoard, -1); break;
+        }
+      }
+
+      frontEndPlayers[socket.id].board = tempBoard;
+      currentHole = holePos(frontEndPlayers[socket.id].board);
+      keys.space.pressed = false;
+    }
+  }
+  
+  /*
   if (keys.w.pressed) {
     moveUD(frontEndPlayers[socket.id].board, 1)
     socket.emit('keydown', { keycode: 'KeyW' })
@@ -574,12 +598,18 @@ setInterval(() => {
     socket.emit('keydown', { keycode: 'KeyD' })
     keys.d.pressed = false;
   }
+  */
 }, 15)
 
 // listens for key being pressed and updates keys object
 window.addEventListener('keydown', (event) => {
   if (!frontEndPlayers[socket.id]) return
 
+  if (event.code === 'Space') {
+    keys.space.pressed = true;
+  }
+
+  /*
   switch(event.code) {
     case 'KeyW':
     case 'ArrowUp':
@@ -598,10 +628,16 @@ window.addEventListener('keydown', (event) => {
       keys.d.pressed = true
       break
   }
+  */
 })
 window.addEventListener('keyup', (event) => {
   if (!frontEndPlayers[socket.id]) return
   
+  if (event.code === 'Space') {
+    keys.space.pressed = false;
+  }
+  
+  /*
   switch(event.code) {
     case 'KeyW':
     case 'ArrowUp':
@@ -620,8 +656,9 @@ window.addEventListener('keyup', (event) => {
       keys.d.pressed = false
       break
   }
+  */
 })
-*/
+
 
 document.querySelector('#usernameForm').addEventListener('submit', (event) => {
   
