@@ -31,18 +31,24 @@ Two players can join a match, view each other's boards live, and compete in a ti
 
 ---
 
-## What I Learned
+## Installation
 
-Building this helped me understand:
-- How real-time multiplayer games manage **synchronization** between players
-- The complexity behind even simple online games
-- Why game engines are so valuablem, even small features require careful architecture and logic
+To run this game, you will need Node.js and npm (Node Package Manager) installed on your system.
 
-This was a great challenge, and it gave me a deep appreciation for the systems behind the games we play every day.
+1. **Clone the repository into a directory**.
+
+2. **Install Dependencies**:  
+   Navigate to the directory containing `backend.js` in your terminal and install the required Node.js packages:  
+   `npm install express socket.io`
+
+3. **Start the Backend Server**:  
+  From the same directory, run the backend server:  
+  `node backend.js`
+
+You should see `Listening on port 3000` and `Server loaded` messages in your terminal.
+
+4. **Open in Browser**:  
+Open your web browser and go to `http://localhost:3000`.
+Enter a username and click "Join" to start playing. Open another tab or browser window to play against yourself or have a second player join.
 
 ---
-
-## 📁 Tech Stack
-
-- **Frontend:** HTML5, CSS, JavaScript (Canvas-based rendering)
-- **Backend:** Node.js, Socket.IO
