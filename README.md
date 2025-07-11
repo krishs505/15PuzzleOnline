@@ -1,6 +1,6 @@
 # 15 Puzzle Online
 
-15 Puzzle Online is a real-time multiplayer version of the classic sliding tile game, built using JavaScript, HTML5, Node.js, and Socket.IO. Two players compete live to solve a generated puzzle, with synchronized board updates, real-time event handling, and a shared timer.
+15 Puzzle Online is a real-time multiplayer version of the classic sliding tile game, built using Node.js, HTML5, and Socket.IO. Two players compete live to solve a generated puzzle, with synchronized board updates, real-time event handling, and a shared timer.
 
 ---
 
