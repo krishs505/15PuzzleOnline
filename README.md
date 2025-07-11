@@ -1,18 +1,46 @@
-After learning the basics of web development from [Chris Courses](https://youtu.be/HXquxWtE5vA?si=XqffIVUytveY2Kbd), I created this online multiplayer game to play someone in a game of 15 Puzzle.
+# 15 Puzzle Online
 
-15 Puzzle is a sliding puzzle game in which you number square tiles from 1 through 15.
+After learning the basics of web development from [Chris Courses](https://youtu.be/HXquxWtE5vA?si=XqffIVUytveY2Kbd), I created this **real-time online multiplayer version of the classic 15 Puzzle** — a sliding puzzle game where tiles numbered 1 through 15 must be arranged in order.
 
-This repo includes a frontend in JS and HTML and a backend in Node.js. It allows two players to see each other's boards at once and compete in a timed match.
+This project includes:
+- A **frontend** built with JavaScript and HTML5
+- A **Node.js backend** powered by Socket.IO for real-time communication
 
-![image](https://github.com/KiheiCodes/15PuzzleOnline/assets/80540914/476acfd7-7df0-4438-8bd2-4a71560f1134)
+Two players can join a match, view each other's boards live, and compete in a timed game.
 
+![Gameplay Screenshot](https://github.com/KiheiCodes/15PuzzleOnline/assets/80540914/476acfd7-7df0-4438-8bd2-4a71560f1134)
 
-How it works:
-- The frontend listens for key strokes (WASD || arrow keys).
-- It updates the player's board based on 15 Puzzle rules and sends an event to the backend ("hey, this user pressed this key").
-- The backend updates this player's "backend board", which is then emitted to the frontend (all users) every 15 milliseconds (probably more in a server hosted hundreds of miles away).
-- Of course, there is additional data sent and received such as UNIX timestamps (the point in time the user started playing - to keep track of stopwatch), ready status, puzzle completion, generating random boards, etc.
+---
 
-It sounds like a lot because well, it is. I was pretty shocked to realize how much development goes into a simple multiplayer game.
+## How It Works
 
-I can only imagine how much effort goes into far more complicated games that we play everyday (although I guess game engines handle a lot of it).
+- The frontend listens for keystrokes (WASD or arrow keys).
+- When a player makes a move, the client:
+  - Updates their local puzzle board using 15 Puzzle rules
+  - Sends a socket event to the server with the move
+- The backend:
+  - Updates the player's board state server-side
+  - Broadcasts updated board data to **both players** every ~15 milliseconds
+- Other features:
+  - Match start synchronization using UNIX timestamps
+  - Real-time puzzle completion detection
+  - "Ready" state handling for pre-game logic
+  - Procedural random puzzle generation
+
+---
+
+## What I Learned
+
+Building this helped me understand:
+- How real-time multiplayer games manage **synchronization** between players
+- The complexity behind even simple online games
+- Why game engines are so valuablem, even small features require careful architecture and logic
+
+This was a great challenge, and it gave me a deep appreciation for the systems behind the games we play every day.
+
+---
+
+## 📁 Tech Stack
+
+- **Frontend:** HTML5, CSS, JavaScript (Canvas-based rendering)
+- **Backend:** Node.js, Socket.IO
