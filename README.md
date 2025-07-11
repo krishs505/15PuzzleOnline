@@ -1,6 +1,8 @@
 # 15 Puzzle Online
 
-After learning the basics of web development from [Chris Courses](https://youtu.be/HXquxWtE5vA?si=XqffIVUytveY2Kbd), I created this **real-time online multiplayer version of the classic 15 Puzzle** — a sliding puzzle game where tiles numbered 1 through 15 must be arranged in order.
+15 Puzzle Online is a real-time multiplayer version of the classic sliding tile game, built using JavaScript, HTML5, Node.js, and Socket.IO. Two players compete live to solve a generated puzzle, with synchronized board updates, real-time event handling, and a shared timer.
+
+---
 
 This project includes:
 - A **frontend** built with JavaScript and HTML5
