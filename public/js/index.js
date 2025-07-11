@@ -543,7 +543,7 @@ function moveUD(board, n) {
 }
 
 
-// every 15 ms, check if a key is pressed, move tiles, emit it to backend
+// every 15 ms, check if spacebar is pressed, generate board, emit it to backend
 setInterval(() => {
   if (stage === "lobby") {
     if (keys.space.pressed) {
@@ -570,6 +570,9 @@ setInterval(() => {
 
       frontEndPlayers[socket.id].board = tempBoard;
       currentHole = holePos(frontEndPlayers[socket.id].board);
+
+      socket.emit('boardUpdate', frontEndPlayers[socket.id].board);
+
       keys.space.pressed = false;
     }
   }
