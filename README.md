@@ -1,6 +1,6 @@
 # 15 Puzzle Online
 
-15 Puzzle Online is a real-time multiplayer version of the classic sliding tile game, built using Node.js, HTML5, and Socket.IO. Two players compete live to solve a generated puzzle, with synchronized board updates, real-time event handling, and a shared timer.
+15 Puzzle Online is a real-time multiplayer version of the classic sliding tile game, built using Node.js, HTML5, and Socket.IO. Two players compete live to solve a randomly generated puzzle, with synchronized board updates, real-time event handling, and a shared timer.
 
 ---
 
@@ -10,13 +10,13 @@ This project includes:
 
 Two players can join a match, view each other's boards live, and compete in a timed game.
 
-![Gameplay Screenshot](https://github.com/KiheiCodes/15PuzzleOnline/assets/80540914/476acfd7-7df0-4438-8bd2-4a71560f1134)
+<img width="1646" height="733" alt="Screenshot 2025-07-10 231818" src="https://github.com/user-attachments/assets/bda22bc8-bb2c-4bcf-b46d-7410701c3e44" />
 
 ---
 
 ## How It Works
 
-- The frontend listens for keystrokes (WASD or arrow keys).
+- The frontend listens for mouse movements over tiles.
 - When a player makes a move, the client:
   - Updates their local puzzle board using 15 Puzzle rules
   - Sends a socket event to the server with the move
