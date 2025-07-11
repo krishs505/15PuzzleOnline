@@ -1,18 +1,54 @@
-After learning the basics of web development from [Chris Courses](https://youtu.be/HXquxWtE5vA?si=XqffIVUytveY2Kbd), I created this online multiplayer game to play someone in a game of 15 Puzzle.
+# 15 Puzzle Online
 
-15 Puzzle is a sliding puzzle game in which you number square tiles from 1 through 15.
+15 Puzzle Online is a real-time multiplayer version of the classic sliding tile game, built using Node.js, HTML5, and Socket.IO. Two players compete live to solve a generated puzzle, with synchronized board updates, real-time event handling, and a shared timer.
 
-This repo includes a frontend in JS and HTML and a backend in Node.js. It allows two players to see each other's boards at once and compete in a timed match.
+---
 
-![image](https://github.com/KiheiCodes/15PuzzleOnline/assets/80540914/476acfd7-7df0-4438-8bd2-4a71560f1134)
+This project includes:
+- A **frontend** built with JavaScript and HTML5
+- A **Node.js backend** powered by Socket.IO for real-time communication
 
+Two players can join a match, view each other's boards live, and compete in a timed game.
 
-How it works:
-- The frontend listens for key strokes (WASD || arrow keys).
-- It updates the player's board based on 15 Puzzle rules and sends an event to the backend ("hey, this user pressed this key").
-- The backend updates this player's "backend board", which is then emitted to the frontend (all users) every 15 milliseconds (probably more in a server hosted hundreds of miles away).
-- Of course, there is additional data sent and received such as UNIX timestamps (the point in time the user started playing - to keep track of stopwatch), ready status, puzzle completion, generating random boards, etc.
+![Gameplay Screenshot](https://github.com/KiheiCodes/15PuzzleOnline/assets/80540914/476acfd7-7df0-4438-8bd2-4a71560f1134)
 
-It sounds like a lot because well, it is. I was pretty shocked to realize how much development goes into a simple multiplayer game.
+---
 
-I can only imagine how much effort goes into far more complicated games that we play everyday (although I guess game engines handle a lot of it).
+## How It Works
+
+- The frontend listens for keystrokes (WASD or arrow keys).
+- When a player makes a move, the client:
+  - Updates their local puzzle board using 15 Puzzle rules
+  - Sends a socket event to the server with the move
+- The backend:
+  - Updates the player's board state server-side
+  - Broadcasts updated board data to **both players** every ~15 milliseconds
+- Other features:
+  - Match start synchronization using UNIX timestamps
+  - Real-time puzzle completion detection
+  - "Ready" state handling for pre-game logic
+  - Procedural random puzzle generation
+
+---
+
+## Installation
+
+To run this game, you will need Node.js and npm (Node Package Manager) installed on your system.
+
+1. **Clone the repository into a directory**.
+
+2. **Install Dependencies**:  
+   Navigate to the directory containing `backend.js` in your terminal and install the required Node.js packages:  
+   `npm install express socket.io`
+
+3. **Start the Backend Server**:  
+  From the same directory, run the backend server:  
+  `node backend.js`
+
+You should see `Listening on port 3000` and `Server loaded` messages in your terminal.
+
+4. **Open in Browser**:  
+Open your web browser and go to `http://localhost:3000`.
+Enter a username and click "Join" to start playing. Open another tab or browser window to play against yourself or have a second player join.
+
+---
